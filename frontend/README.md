@@ -1,0 +1,2 @@
+- push to git it will update the server
+- before that setup mongodb in the server and run all the routes once

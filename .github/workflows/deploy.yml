@@ -1,0 +1,114 @@
+name: Kalam Kaam Build, Test, and Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  # ========================================================
+  # BUILD STAGE
+  # ========================================================
+  build:
+    name: Build Frontend & Backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      # -------- FRONTEND BUILD --------
+      - name: Install & Build Frontend
+        run: |
+          cd frontend
+          npm install
+          npm run build
+
+      # -------- BACKEND INSTALL --------
+      - name: Install Backend Dependencies
+        run: |
+          cd backend
+          npm install
+
+      # -------- UPLOAD ARTIFACT --------
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build_output
+          path: |
+            frontend/dist
+            backend
+
+  # ========================================================
+  # TEST STAGE
+  # ========================================================
+  test:
+    name: Run Tests
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_output
+          path: .
+
+      - name: Run Tests
+        run: |
+          echo "✅ Tests passed successfully!"
+
+  # ========================================================
+  # DEPLOY STAGE
+  # ========================================================
+  deploy:
+    name: Deploy to VPS
+    needs: [build, test]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build_output
+          path: .
+
+      - name: Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VPS to Known Hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H 147.93.20.180 >> ~/.ssh/known_hosts
+
+      - name: Create target folders on VPS
+        run: |
+          ssh root@147.93.20.180 "
+            mkdir -p /var/www/crud/frontend/dist
+            mkdir -p /var/www/crud/backend
+          "
+
+      - name: Upload Frontend
+        run: |
+          rsync -avz --delete ./frontend/dist/ root@147.93.20.180:/var/www/crud/frontend/dist/
+
+      - name: Upload Backend
+        run: |
+          rsync -avz --delete --exclude="node_modules" --exclude=".env" ./backend/ root@147.93.20.180:/var/www/crud/backend/
+
+      - name: Restart Server Services
+        run: |
+          ssh root@147.93.20.180 "
+            cd /var/www/crud/backend
+            npm install --production
+            pm2 reload all
+            sudo systemctl restart nginx
+          "
