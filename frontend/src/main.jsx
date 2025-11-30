@@ -11,7 +11,6 @@ import ErrorPageWrapper from "./pages/ErrorPageWrapper.jsx";
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <BrowserRouter>
-      import ErrorPage from "./components/ErrorPage.jsx";
       <Routes>
         <Route path="/" element={<App />}>
           <Route index element={<Users />} />
