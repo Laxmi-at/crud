@@ -33,7 +33,7 @@ const Register = () => {
       return;
     }
     if (!ageReg.test(age)) {
-      setMessage("Age: only numbers (1–3 digits).");
+      setMessage("Age must be between 1 and 120.");
       return;
     }
     if (!emailReg.test(email)) {
