@@ -52,7 +52,7 @@ const Register = () => {
       setMessage("Registration successful!");
       setUser({ name: "", age: "", email: "", password: "" });
     } catch (error) {
-      setMessage(error.response?.data || "Something went wrong");
+      setMessage(error.response?.data?.messsage || "Something went wrong");
     } finally {
       setLoading(false);
     }

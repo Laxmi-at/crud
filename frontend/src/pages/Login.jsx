@@ -47,8 +47,7 @@ const Login = () => {
 
       setUser({ email: "", password: "" });
     } catch (error) {
-      setMessage("Something went wrong");
-      console.log(error);
+      setMessage(error.response?.data?.messsage || "Something went wrong");
     } finally {
       setLoading(false);
     }
