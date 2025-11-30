@@ -48,7 +48,7 @@ const Register = () => {
     // Send data to server
     setLoading(true);
     try {
-      await axios.post("http://127.0.0.1:3000/api/users/register", { ...user });
+      await axios.post("http://127.0.0.1:3000/users/register", { ...user });
       setMessage("Registration successful!");
       setUser({ name: "", age: "", email: "", password: "" });
     } catch (error) {
