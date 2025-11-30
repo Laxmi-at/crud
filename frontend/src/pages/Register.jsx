@@ -1,7 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
 
+import { useNavigate } from "react-router-dom";
+
 const Register = () => {
+  const navigate = useNavigate();
+
   const [user, setUser] = useState({
     name: "",
     age: "",
@@ -48,11 +52,22 @@ const Register = () => {
     // Send data to server
     setLoading(true);
     try {
-      await axios.post("http://127.0.0.1:3000/users/register", { ...user });
+      await axios.post("/api/users/register", { ...user });
       setMessage("Registration successful!");
       setUser({ name: "", age: "", email: "", password: "" });
     } catch (error) {
-      setMessage(error.response?.data?.messsage || "Something went wrong");
+      if (error.response) {
+        navigate("/error", {
+          state: {
+            status: error.response.status,
+            message: error.response.data?.message || "Server Error",
+          },
+        });
+      } else {
+        navigate("/error", {
+          state: { status: 500, message: "No response from server" },
+        });
+      }
     } finally {
       setLoading(false);
     }

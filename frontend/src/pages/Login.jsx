@@ -35,22 +35,19 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post(
-        "http://127.0.0.1:3000/api/users/login",
-        {
-          ...user,
-        }
-      );
+      const response = await axios.post("http://127.0.0.1:3000/users/login", {
+        ...user,
+      });
       setMessage("Login successful!");
 
-      // Store token if backend sends one
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-      }
+      // // Store token if backend sends one
+      // if (response.data.token) {
+      //   localStorage.setItem("token", response.data.token);
+      // }
 
       setUser({ email: "", password: "" });
     } catch (error) {
-      setMessage(error.response?.data?.messsage || "Something went wrong");
+      setMessage(error.response?.data?.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
