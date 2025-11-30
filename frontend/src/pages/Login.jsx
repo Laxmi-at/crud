@@ -35,9 +35,12 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const response = await axios.post("http://127.0.0.1:3000/users/login", {
-        ...user,
-      });
+      const response = await axios.post(
+        "http://127.0.0.1:3000/api/users/login",
+        {
+          ...user,
+        }
+      );
       setMessage("Login successful!");
 
       // Store token if backend sends one
