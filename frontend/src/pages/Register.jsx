@@ -23,7 +23,7 @@ const Register = () => {
     e.preventDefault();
 
     const nameReg = /^[a-zA-Z\s]{3,10}$/;
-    const ageReg = /^[0-9]{1,3}$/;
+    const ageReg = /^(?:[1-9]|[1-9][0-9]|1[01][0-9]|120)$/;
     const passwordReg = /^[a-zA-Z0-9]{8,10}$/;
     const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
