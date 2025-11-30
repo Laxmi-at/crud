@@ -1,6 +1,5 @@
 import { useState } from "react";
 import axios from "axios";
-
 import { useNavigate } from "react-router-dom";
 
 const Register = () => {
@@ -12,28 +11,29 @@ const Register = () => {
     email: "",
     password: "",
   });
-
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState(""); // For inline messages
   const [loading, setLoading] = useState(false);
 
   const { name, age, email, password } = user;
 
+  // Handle input change
   const handleChange = (e) => {
     setUser({ ...user, [e.target.name]: e.target.value });
-    setMessage(""); // Clear previous messages on input change
+    setMessage(""); // clear previous message
   };
+
+  // Validation regex
+  const nameReg = /^[a-zA-Z\s]{3,10}$/;
+  const ageReg = /^(?:[1-9]|[1-9][0-9]|1[01][0-9]|120)$/;
+  const passwordReg = /^[a-zA-Z0-9]{8,10}$/;
+  const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const nameReg = /^[a-zA-Z\s]{3,10}$/;
-    const ageReg = /^(?:[1-9]|[1-9][0-9]|1[01][0-9]|120)$/;
-    const passwordReg = /^[a-zA-Z0-9]{8,10}$/;
-    const emailReg = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-    // Validation
+    // Client-side validation
     if (!nameReg.test(name)) {
-      setMessage("Name: only characters, 3–10 letters.");
+      setMessage("Name: only letters and spaces, 3–10 characters.");
       return;
     }
     if (!ageReg.test(age)) {
@@ -49,25 +49,22 @@ const Register = () => {
       return;
     }
 
-    // Send data to server
     setLoading(true);
+
     try {
+      // Send data to backend via relative /api/ URL
       await axios.post("/api/users/register", { ...user });
+
       setMessage("Registration successful!");
+
+      // Clear form
       setUser({ name: "", age: "", email: "", password: "" });
+
+      // Optional: redirect to login after 2 seconds
+      setTimeout(() => navigate("/login"), 2000);
     } catch (error) {
-      if (error.response) {
-        navigate("/error", {
-          state: {
-            status: error.response.status,
-            message: error.response.data?.message || "Server Error",
-          },
-        });
-      } else {
-        navigate("/error", {
-          state: { status: 500, message: "No response from server" },
-        });
-      }
+      // Inline error message
+      setMessage(error.response?.data?.message || "Server error, try again.");
     } finally {
       setLoading(false);
     }
@@ -76,7 +73,12 @@ const Register = () => {
   return (
     <div className="register">
       <h1>Register</h1>
-      {message && <h4>{message}</h4>}
+      {message && (
+        <h4 style={{ color: message.includes("successful") ? "green" : "red" }}>
+          {message}
+        </h4>
+      )}
+
       <form onSubmit={handleSubmit}>
         <label htmlFor="name">Name</label>
         <input
@@ -85,6 +87,7 @@ const Register = () => {
           id="name"
           value={name}
           onChange={handleChange}
+          autoComplete="name"
         />
 
         <label htmlFor="age">Age</label>
@@ -94,6 +97,7 @@ const Register = () => {
           id="age"
           value={age}
           onChange={handleChange}
+          autoComplete="off"
         />
 
         <label htmlFor="email">Email</label>
@@ -103,6 +107,7 @@ const Register = () => {
           id="email"
           value={email}
           onChange={handleChange}
+          autoComplete="email"
         />
 
         <label htmlFor="password">Password</label>
@@ -112,6 +117,7 @@ const Register = () => {
           id="password"
           value={password}
           onChange={handleChange}
+          autoComplete="current-password"
         />
 
         <button type="submit" disabled={loading}>
