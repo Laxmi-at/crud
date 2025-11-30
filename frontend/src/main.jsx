@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router";
 import Users from "./pages/Users.jsx";
 import Register from "./pages/Register.jsx";
 import Login from "./pages/Login.jsx";
+import ErrorPageWrapper from "./pages/ErrorPageWrapper.jsx";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
